@@ -1,13 +1,14 @@
 'use strict';
 
-///////////////////////////////////////
-// Modal window
-
 const modal = document.querySelector('.modal');
 const overlay = document.querySelector('.overlay');
 const btnCloseModal = document.querySelector('.btn--close-modal');
 const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
+const btnScrollTo = document.querySelector('.btn--scroll-to');
+const section1 = document.querySelector('#section--1');
 
+///////////////////////////////////////
+// Modal window
 const openModal = function (e) {
   e.preventDefault();
   modal.classList.remove('hidden');
@@ -29,7 +30,58 @@ document.addEventListener('keydown', function (e) {
     closeModal();
   }
 });
+//page navigation
+// document.querySelectorAll('.nav__link').forEach(function (link) {
+//   link.addEventListener('click', function (e) {
+//     e.preventDefault();
+//     const id = this.getAttribute('href');
+//     console.log(id);
+//   });
+// });
+// 1. add event listener to common parent element
+// 2.what element originated the event
+document.querySelector('.nav__links').addEventListener('click', function (e) {
+  e.preventDefault();
+  //matching
+  if (e.target.classList.contains('nav__link')) {
+    const id = e.target.getAttribute('href');
+    document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
+  }
+});
 
+//smooth scroll to section 1
+btnScrollTo.addEventListener('click', function (e) {
+  const s1Coords = section1.getBoundingClientRect();
+  console.log(s1Coords);
+
+  console.log('current scroll (x/y)', window.scrollX, window.scrollY);
+  //scrooling
+  // window.scrollTo({
+  //   left:s1Coords.left + window.scrollX,
+  //   top:s1Coords.top + window.scrollY,
+  //   behavior: 'smooth'
+  // });
+  section1.scrollIntoView({ behavior: 'smooth' });
+});
+
+// tabbed component
+const tabs = document.querySelectorAll('.operations__tab');
+const tabsContainer = document.querySelector('.operations__tab-container');
+const tabsContent = document.querySelectorAll('.operations__content');
+
+tabsContainer.addEventListener('click', function (e) {
+  const clicked = e.target.closest('.operations__tab');
+  // gard clause
+  if (!clicked) return;
+
+  tabs.forEach(t => t.classList.remove('operations__tab--active')); // remove active from all tabs
+  clicked.classList.add('operations__tab--active');
+
+  // Activate content area
+  tabsContent.forEach(c=> c.classList.remove('operations__content--active'));
+  document.querySelector(`.operations__content--${clicked.dataset.tab}`).classList.add('operations__content--active');
+});
+/*
 ////////////////////////////////////////////////////////////////
 //selecting
 console.log(document.documentElement); //selecting the whole document element
@@ -97,3 +149,47 @@ console.log(logo.dataset.versionNumber);
 // logo.classList.remove('')
 // logo.classList.toggle('')
 // logo.classList.contains('')
+
+
+
+
+// const h1 = document.querySelector('h1');
+// const alertH1 = function (e) {
+//   alert('you are reading the heading')
+// }
+
+// h1.addEventListener('mouseenter', alertH1);
+// setTimeout(()=> h1.removeEventListener('mouseenter', alertH1),3000)
+
+const randomInt = function (min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+};
+
+const randomColor = () => `rgb(${randomInt(0, 255)},${randomInt(0, 255)},${randomInt(0, 255)})`
+console.log(randomColor());
+
+
+const h1 = document.querySelector('h1');
+
+// going downwards : selecting child elements
+console.log(h1.querySelectorAll('.highlight'));
+console.log(h1.childNodes); // all the nodes in the h1 element
+console.log(h1.children); // all the direct child elements in the h1 element
+h1.firstElementChild.style.color = '#fff';
+h1.lastElementChild.style.color = 'orangered';
+
+// going upwards : selecting parent elements
+console.log(h1.parentNode); //direct parent node
+console.log(h1.parentElement); //direct parent element
+h1.closest('.header').style.background = `var(--gradient-secondary)`; // closest parent element with the specified selector
+
+//going sideways : selecting sibling elements
+console.log(h1.previousElementSibling);
+console.log(h1.nextElementSibling);
+
+// get all the siblings
+console.log(h1.parentElement.children);
+[...h1.parentElement.children].forEach(el => {
+  if (el !== h1) el.style.transform = 'scale(0.5)';
+});
+*/
