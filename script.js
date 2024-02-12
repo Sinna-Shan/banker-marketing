@@ -6,6 +6,12 @@ const btnCloseModal = document.querySelector('.btn--close-modal');
 const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
 const btnScrollTo = document.querySelector('.btn--scroll-to');
 const section1 = document.querySelector('#section--1');
+const tabs = document.querySelectorAll('.operations__tab');
+const tabsContainer = document.querySelector('.operations__tab-container');
+const tabsContent = document.querySelectorAll('.operations__content');
+const nav = document.querySelector('.nav');
+const header = document.querySelector('.header');
+const allSections = document.querySelectorAll('.section');
 
 ///////////////////////////////////////
 // Modal window
@@ -65,10 +71,6 @@ btnScrollTo.addEventListener('click', function (e) {
 });
 
 // tabbed component
-const tabs = document.querySelectorAll('.operations__tab');
-const tabsContainer = document.querySelector('.operations__tab-container');
-const tabsContent = document.querySelectorAll('.operations__content');
-
 tabsContainer.addEventListener('click', function (e) {
   const clicked = e.target.closest('.operations__tab');
   // gard clause
@@ -78,8 +80,71 @@ tabsContainer.addEventListener('click', function (e) {
   clicked.classList.add('operations__tab--active');
 
   // Activate content area
-  tabsContent.forEach(c=> c.classList.remove('operations__content--active'));
-  document.querySelector(`.operations__content--${clicked.dataset.tab}`).classList.add('operations__content--active');
+  tabsContent.forEach(c => c.classList.remove('operations__content--active'));
+  document
+    .querySelector(`.operations__content--${clicked.dataset.tab}`)
+    .classList.add('operations__content--active');
+});
+
+// menu fade animation
+const handelHover = function (e) {
+  if (e.target.classList.contains('nav__link')) {
+    const link = e.target;
+    const siblings = link.closest('.nav').querySelectorAll('.nav__link');
+    const logo = link.closest('.nav').querySelector('img');
+
+    siblings.forEach(el => {
+      if (el !== link) el.style.opacity = this;
+    });
+    logo.style.opacity = this;
+  }
+};
+
+// passing "arguments" to a handler function using bind
+nav.addEventListener('mouseover', handelHover.bind(0.5));
+nav.addEventListener('mouseout', handelHover.bind(1));
+
+//Sticky navigation
+// const initialCoords = section1.getBoundingClientRect();
+// window.addEventListener('scroll', function(){
+//   console.log(window.scrollY);
+//   console.log(initialCoords);
+//   if(window.scrollY > initialCoords.top) nav.classList.add('sticky')
+//   else nav.classList.remove('sticky');
+// });
+
+//Sticky navigation : Intersection observer API
+const navHeight = nav.getBoundingClientRect().height;
+const obsFunc = function (entries, observer) {
+  const [entry] = entries;
+  if (!entry.isIntersecting) nav.classList.add('sticky');
+  else nav.classList.remove('sticky');
+};
+
+const obsOptions = {
+  root: null,
+  threshold: 0,
+  rootMargin: `-${navHeight}px`,
+};
+const headerObserver = new IntersectionObserver(obsFunc, obsOptions);
+headerObserver.observe(header);
+
+// reveal sections
+const revealSection = function (entries, observer) {
+  const[entry] = entries;
+  
+  if(!entry.isIntersecting) return;
+
+  entry.target.classList.remove('section--hidden');
+  observer.unobserve(entry.target);
+};
+const sectionObserver = new IntersectionObserver(revealSection, {
+  root: null,
+  threshold: 0.15,
+});
+allSections.forEach(section => {
+  section.classList.add('section--hidden');
+  sectionObserver.observe(section);
 });
 /*
 ////////////////////////////////////////////////////////////////
